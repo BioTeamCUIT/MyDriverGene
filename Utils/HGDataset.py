@@ -128,7 +128,8 @@ class HGDataset(InMemoryDataset):
         protein_feature['CTD'] = protein_feature['CTD'].str.replace(']', '')
         protein_feature = protein_feature.sort_values(by='From', ignore_index=True)
         protein_feature = pd.concat([protein_feature['From'], protein_feature['CTD'].str.split(', ', expand=True)], axis=1)
-        protein_feature = pd.merge(left=unique_protein_id, right=protein_feature, how='inner', left_on='ProteinID', right_on='From')
+        protein_feature = pd.merge(left=unique_protein_id, right=protein_feature, how='left', left_on='ProteinID', right_on='From')
+        protein_feature = protein_feature.fillna(0)
         protein_feature = protein_feature.iloc[:, 3:]
         protein_feature_vector = torch.from_numpy(protein_feature.values.astype(float))
         protein_feature_vector = protein_feature_vector.to(torch.float32)

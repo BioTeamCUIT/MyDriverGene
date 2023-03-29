@@ -41,6 +41,7 @@ class PathwayConstructor():
     def construct_pathway(self):
         print("Reading KEGG, please waite ... \n")
         kegg = pd.read_csv(os.path.join(self.file_path, "path_similarity.csv"), index_col=0)
+        # kegg = pd.read_csv(os.path.join(self.file_path, "pathsim_matrix.csv"), index_col=0, sep='\t')
         # Get the gene with omic feature
         omic_feature = pd.read_csv("E:\\xiong\\Bioinfomatics\\DriverGenes\\WorkingSpace\\MyDriveGenes\\RawData\\OmicFeatures\\biological_features.csv", sep='\t', index_col=0)
         # kegg_genes: 8200

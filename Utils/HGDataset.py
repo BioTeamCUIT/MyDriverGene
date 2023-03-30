@@ -60,10 +60,10 @@ class HGDataset(InMemoryDataset):
         ppi_path = "RawData\\Associations\\PPI"
         ppi_constructor = PPIConstructor(file_path=ppi_path)
         # edge_index_ppi ==> torch.Size([2, 505968]) ; unique_protein_id ==> (16814, 2)
-        # edge_index_ppi, unique_protein_id = ppi_constructor.construct_ppi()
+        edge_index_ppi, unique_protein_id = ppi_constructor.construct_ppi()
         # 测试，直接读取
-        edge_index_ppi = torch.load(os.path.join(self.root, ppi_path, 'edge_index_ppi.pth'))
-        unique_protein_id = pd.read_csv(os.path.join(self.root, ppi_path, 'unique_protein_id.csv'))
+        # edge_index_ppi = torch.load(os.path.join(self.root, ppi_path, 'edge_index_ppi.pth'))
+        # unique_protein_id = pd.read_csv(os.path.join(self.root, ppi_path, 'unique_protein_id.csv'))
         # torch.save(edge_index_ppi, os.path.join(self.root, ppi_path, 'edge_index_ppi.pth'))
         # unique_protein_id.to_csv(os.path.join(self.root, ppi_path, 'unique_protein_id.csv'), index=False)
 
@@ -152,12 +152,12 @@ class HGDataset(InMemoryDataset):
 
     def process(self):
         edge_index_ppi, edge_index_pathway, edge_index_p_g, unique_protein_id, unique_gene_id = self.construct_edge()
-        # omics_vector_gene = self.construct_gene_feature(unique_gene_id=unique_gene_id)
+        omics_vector_gene = self.construct_gene_feature(unique_gene_id=unique_gene_id)
         protein_feature_vector = self.construct_protein_feature(unique_protein_id=unique_protein_id)
         idx_list, label_list = self.construct_label(unique_gene_id)
 
         data = HeteroData()
-        # data['gene'].x = omics_vector_gene
+        data['gene'].x = omics_vector_gene
         data['protein'].x = protein_feature_vector
         data['gene'].y = torch.from_numpy(label_list)
         data['gene'].label_index = torch.from_numpy(idx_list)

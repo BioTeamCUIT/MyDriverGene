@@ -10,11 +10,12 @@ import scipy.sparse as sp
 
 from torch_geometric.utils import from_scipy_sparse_matrix
 
-os.chdir("E:\\xiong\\Bioinfomatics\\DriverGenes\\WorkingSpace\\MyDriveGenes")
+# os.chdir("E:\\xiong\\Bioinfomatics\\DriverGenes\\WorkingSpace\\MyDriveGenes")
+os.chdir("/private/xiongshuwen/CancerGene/workingspace/MyDriverGenes")
 
 
 class PathwayConstructor():
-    def __init__(self, file_path, thr_path=0.6):
+    def __init__(self, file_path, thr_path=0.5):
         super(PathwayConstructor, self).__init__()
         self.file_path = file_path
         self.thr_path = thr_path
@@ -43,7 +44,7 @@ class PathwayConstructor():
         kegg = pd.read_csv(os.path.join(self.file_path, "path_similarity.csv"), index_col=0)
         # kegg = pd.read_csv(os.path.join(self.file_path, "pathsim_matrix.csv"), index_col=0, sep='\t')
         # Get the gene with omic feature
-        omic_feature = pd.read_csv("E:\\xiong\\Bioinfomatics\\DriverGenes\\WorkingSpace\\MyDriveGenes\\RawData\\OmicFeatures\\biological_features.csv", sep='\t', index_col=0)
+        omic_feature = pd.read_csv("RawData/OmicFeatures/biological_features.csv", sep='\t', index_col=0)
         # kegg_genes: 8200
         kegg_genes = set(kegg.columns.values)
         # omic_gene: 13627
@@ -53,7 +54,7 @@ class PathwayConstructor():
         kegg = kegg.loc[genes_keep][genes_keep]
 
         # Filter interactions by threshold
-        kegg_matrix = kegg.applymap(lambda x: 0 if x <= self.thr_path else 1)
+        kegg_matrix = kegg.applymap(lambda x: 0 if x < self.thr_path else 1)
         np.fill_diagonal(kegg_matrix.values, 0)
         # Construct edge_index from adj
         edge_index_pathway = from_scipy_sparse_matrix(sp.coo_matrix(kegg_matrix))[0]

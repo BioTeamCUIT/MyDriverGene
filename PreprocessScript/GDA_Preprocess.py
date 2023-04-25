@@ -15,7 +15,8 @@ from torch_geometric.nn import to_hetero, HANConv
 
 from sklearn.model_selection import train_test_split
 
-os.chdir("E:\\xiong\\Bioinfomatics\\DriverGenes\\WorkingSpace\\MyDriveGenes")
+# os.chdir("E:\\xiong\\Bioinfomatics\\DriverGenes\\WorkingSpace\\MyDriveGenes")
+os.chdir("/private/xiongshuwen/CancerGene/workingspace/MyDriverGenes")
 
 
 

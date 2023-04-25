@@ -42,7 +42,7 @@ class HGDataset(InMemoryDataset):
 
     @property
     def processed_dir(self) -> str:
-        return os.path.join(self.root, 'ProcessedData')
+        return os.path.join(self.root, "ProcessedData_0.6")
 
     @property
     def raw_file_names(self) -> List[str]:
@@ -57,7 +57,8 @@ class HGDataset(InMemoryDataset):
 
     def construct_edge(self):
         print("=======================Start constructing edge_index===============================\n")
-        ppi_path = "RawData\\Associations\\PPI"
+        # ppi_path = "RawData\\Associations\\PPI"
+        ppi_path = "RawData/Associations/PPI"
         ppi_constructor = PPIConstructor(file_path=ppi_path)
         # edge_index_ppi ==> torch.Size([2, 505968]) ; unique_protein_id ==> (16814, 2)
         edge_index_ppi, unique_protein_id = ppi_constructor.construct_ppi()
@@ -67,12 +68,14 @@ class HGDataset(InMemoryDataset):
         # torch.save(edge_index_ppi, os.path.join(self.root, ppi_path, 'edge_index_ppi.pth'))
         # unique_protein_id.to_csv(os.path.join(self.root, ppi_path, 'unique_protein_id.csv'), index=False)
 
-        kegg_path = "RawData\\Associations\\KEGG"
+        # kegg_path = "RawData\\Associations\\KEGG"
+        kegg_path = "RawData/Associations/KEGG"
         kegg_constructor = PathwayConstructor(file_path=kegg_path)
         # edge_index_pathway ==> torch.Size([2, 608064]); unique_gene_id ==> (8200, 2)
         edge_index_pathway, unique_gene_id = kegg_constructor.construct_pathway()
 
-        ensembl_path = "RawData\\Associations\\Ensembl"
+        # ensembl_path = "RawData\\Associations\\Ensembl"
+        ensembl_path = "RawData/Associations/Ensembl"
         ensembl_constructor = PGConstructor(file_path=ensembl_path)
         edge_index_p_g = ensembl_constructor.construct_p_g(unique_protein_id=unique_protein_id,
                                                            unique_gene_id=unique_gene_id)
@@ -86,7 +89,8 @@ class HGDataset(InMemoryDataset):
         :return:
         """
         print("=======================Start constructing gene feature===============================\n")
-        omic_path = "OmicFeatures\\biological_features.csv"
+        # omic_path = "OmicFeatures\\biological_features.csv"
+        omic_path = "OmicFeatures/biological_features.csv"
         omic_feature = pd.read_csv(os.path.join(self.raw_dir, omic_path), sep='\t', index_col=0)
         genes_keep = unique_gene_id['GeneSymbol'].values.tolist()
         omic_feature = omic_feature.loc[genes_keep]
@@ -121,7 +125,7 @@ class HGDataset(InMemoryDataset):
     def construct_protein_feature(self, unique_protein_id):
         print("=======================Start constructing protein feature===============================\n")
         protein_keep = unique_protein_id['ProteinID'].values.tolist()
-        feature_path = "OmicFeatures\\protein_data.csv"
+        feature_path = "OmicFeatures/protein_data.csv"
         protein_feature = pd.read_csv(os.path.join(self.raw_dir, feature_path))
         protein_feature = protein_feature[['From', 'CTD']]
         protein_feature['CTD'] = protein_feature['CTD'].str.replace('[', '')
@@ -138,7 +142,7 @@ class HGDataset(InMemoryDataset):
 
     def construct_label(self, unique_gene_id):
 
-        label_path = "Label\\pancan_genelist_for_train.tsv"
+        label_path = "Label/pancan_genelist_for_train.tsv"
         label_df = pd.read_csv(os.path.join(self.raw_dir, label_path), sep='\t')
         # Merge the gene nodes with labels
         genes_match = pd.merge(left=unique_gene_id['GeneSymbol'], right=label_df, how='left', left_on='GeneSymbol', right_on='Hugosymbol')

@@ -2,7 +2,8 @@ import os
 import torch
 import pandas as pd
 
-os.chdir("E:\\xiong\\Bioinfomatics\\DriverGenes\\WorkingSpace\\MyDriveGenes")
+# os.chdir("E:\\xiong\\Bioinfomatics\\DriverGenes\\WorkingSpace\\MyDriveGenes")
+os.chdir("/private/xiongshuwen/CancerGene/workingspace/MyDriverGenes")
 
 
 class PGConstructor():

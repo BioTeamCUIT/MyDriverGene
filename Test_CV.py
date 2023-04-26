@@ -52,6 +52,7 @@ class Trainer:
         out = self.model(data.x_dict, data.edge_index_dict)
         pred = np.round(
             torch.sigmoid(out[data['gene'].label_index[mask]]).cpu().detach().numpy())
+
         labels = data['gene'].y[mask].cpu()
         ACC, F1, AUROC, AUPR = self.measure(pred, labels)
         return pred, ACC, F1, AUROC, AUPR
@@ -70,7 +71,7 @@ class Trainer:
         if not os.path.exists(path):
             os.makedirs(path)
         #     写入评价指标
-        file_name = os.path.join(path, "{}_KEGG_PPI_Mut_Expr.xlsx".format(self.model_name))
+        file_name = os.path.join(path, "{}_test.xlsx".format(self.model_name))
         file = open(file_name, "a")
 
         file.write(str(np.round(indicators[0], 4)) + " " + str(np.round(indicators[1], 4)) + " " +
@@ -79,14 +80,7 @@ class Trainer:
         file.close()
 
     def run(self, data):
-
         data = data.to(self.device)
-        # Set other features to 0, except for Expr
-        index = [i*3+1 for i in np.arange(16)]
-        # index = index + [i*3+2 for i in np.arange(16)]
-        # index.sort()
-        data['gene'].x[:, index] = 0
-
         for fold in range(self.folds):
             test_pred, test_ACC, test_F1, test_AUROC, test_AUPR = self.inference(data=data,
                                                                                  mask=np.arange(data['gene'].y.shape[0]),

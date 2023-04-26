@@ -1,7 +1,11 @@
 import numpy as np
 import pandas as pd
 from numpy import *
+
+
 from sklearn import metrics
+from sklearn.model_selection import RepeatedStratifiedKFold
+
 
 from Utils.HGDataset import HGDataset
 from Utils.utils import *
@@ -62,6 +66,12 @@ class Trainer:
         file.close()
 
     def run(self, data):
+        kf = RepeatedStratifiedKFold(n_splits=self.folds, n_repeats=self.repeats, random_state=42)
+        splits = kf.split(data['gene'].label_index, data['gene'].y)
+        masks = []
+        for fold, (train_mask, val_mask) in enumerate(splits):
+            masks.append(val_mask)
+
         data = data.to(self.device)
 
         cancers = ['KIRC', 'BRCA', 'READ', 'PRAD', 'STAD', 'HNSC', 'LUAD', 'THCA', 'BLCA', 'ESCA', 'LIHC', 'UCEC',
@@ -74,8 +84,8 @@ class Trainer:
             AUPR = []
             temp['gene'].x[:, 0:i * 3] = 0
             temp['gene'].x[:, (i + 1) * 3:] = 0
-            for fold in range(self.folds):
-                test_pred, test_ACC, test_F1, test_AUROC, test_AUPR = self.inference(data=temp, mask=np.arange(data['gene'].y.shape[0]), fold=fold)
+            for fold, val_mask in enumerate(masks):
+                test_pred, test_ACC, test_F1, test_AUROC, test_AUPR = self.inference(data=temp, mask=val_mask, fold=fold)
                 ACC.append(test_ACC)
                 F1.append(test_F1)
                 AUROC.append(test_AUROC)

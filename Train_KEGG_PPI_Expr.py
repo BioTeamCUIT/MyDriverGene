@@ -65,6 +65,12 @@ class Trainer:
         file.close()
 
     def run(self, data):
+        kf = RepeatedStratifiedKFold(n_splits=self.folds, n_repeats=self.repeats, random_state=42)
+        splits = kf.split(data['gene'].label_index, data['gene'].y)
+        masks = []
+        for fold, (train_mask, val_mask) in enumerate(splits):
+            masks.append(val_mask)
+
         data = data.to(self.device)
         # Set other features to 0, except for Expr
         index = [i*3 for i in np.arange(16)]
@@ -73,8 +79,8 @@ class Trainer:
         data['gene'].x[:, index] = 0
 
 
-        for fold in range(self.folds):
-            test_pred, test_ACC, test_F1, test_AUROC, test_AUPR = self.inference(data=data, mask=np.arange(data['gene'].y.shape[0]),
+        for fold, val_mask in enumerate(masks):
+            test_pred, test_ACC, test_F1, test_AUROC, test_AUPR = self.inference(data=data, mask=val_mask,
                                                                                             fold=fold)
 
             # Save the indicators
